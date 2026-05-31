@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-wrap justify-between items-center gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">{{ current_user.first_name }} {{ current_user.last_name }}</h1>
+            <p class="mt-1 text-gray-600">Registered blood type: <span class="font-semibold text-red-700">{{ current_user.blood_type }}</span></p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{{ url_for('donor.edit_profile') }}" class="px-5 py-3 border border-red-600 text-red-600 rounded-md hover:bg-red-50">Edit Profile</a>
+            <a href="{{ url_for('main.donate') }}" class="px-5 py-3 bg-red-600 text-white rounded-md hover:bg-red-700">Submit Donation</a>
+        </div>
+    </div>
+    <div class="grid gap-6 md:grid-cols-2">
+        <section class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Recent Donations</h2>
+            {% for donation in donations %}
+            <div class="border-b border-gray-100 py-3 last:border-0 flex justify-between">
+                <span>{{ donation.blood_type }} - {{ donation.units }} unit(s)</span>
+                <span class="text-sm text-gray-600">{{ donation.status }}</span>
+            </div>
+            {% else %}<p class="text-gray-500">No donations recorded.</p>{% endfor %}
+        </section>
+        <section class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Blood Drive Participation</h2>
+            {% for registration in registered_drives %}
+            <div class="border-b border-gray-100 py-3 last:border-0">
+                <a href="{{ url_for('main.blood_drive_detail', id=registration.drive.id) }}" class="font-medium hover:text-red-600">{{ registration.drive.title }}</a>
+                <p class="text-sm text-gray-500">{{ registration.drive.location }} | {{ registration.status }}</p>
+            </div>
+            {% else %}<p class="text-gray-500">No active drive participation.</p>{% endfor %}
+        </section>
+    </div>
+</div>
+{% endblock %}

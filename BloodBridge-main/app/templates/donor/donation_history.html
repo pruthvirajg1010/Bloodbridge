@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-wrap justify-between items-center gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Donation History</h1>
+            <p class="mt-1 text-gray-600">Track submitted, accepted and completed donations.</p>
+        </div>
+        <a href="{{ url_for('main.donate') }}" class="px-5 py-3 bg-red-600 text-white rounded-md hover:bg-red-700">New Donation</a>
+    </div>
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        {% if donations.items %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Blood</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Units</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Request</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for donation in donations.items %}
+                    <tr>
+                        <td class="px-6 py-4">{{ donation.donation_date.strftime('%Y-%m-%d') if donation.donation_date else '-' }}</td>
+                        <td class="px-6 py-4 font-medium">{{ donation.blood_type }}</td>
+                        <td class="px-6 py-4">{{ donation.units }}</td>
+                        <td class="px-6 py-4">{{ '#' ~ donation.request_id if donation.request_id else 'General' }}</td>
+                        <td class="px-6 py-4">{{ donation.status }}</td>
+                        <td class="px-6 py-4">{{ donation.admin_notes or donation.notes or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-10 text-center text-gray-500">No donation history found.</div>
+        {% endif %}
+    </div>
+    {% if donations.pages > 1 %}
+    <div class="mt-6 flex justify-center gap-3">
+        {% if donations.has_prev %}<a href="{{ url_for('donor.donation_history', page=donations.prev_num) }}" class="px-4 py-2 border rounded-md">Previous</a>{% endif %}
+        <span class="px-4 py-2">Page {{ donations.page }} of {{ donations.pages }}</span>
+        {% if donations.has_next %}<a href="{{ url_for('donor.donation_history', page=donations.next_num) }}" class="px-4 py-2 border rounded-md">Next</a>{% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

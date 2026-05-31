@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-wrap justify-between items-center gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">{{ current_user.bank_name }}</h1>
+            <p class="mt-1 text-gray-600">License: {{ current_user.license_number or 'Not provided' }} | {{ current_user.address }}</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{{ url_for('blood_bank.edit_profile') }}" class="px-4 py-2 border border-red-600 text-red-600 rounded-md hover:bg-red-50">Edit Profile</a>
+            <a href="{{ url_for('blood_bank.dashboard') }}" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Open Dashboard</a>
+        </div>
+    </div>
+    <div class="grid gap-6 md:grid-cols-2">
+        <section class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Inventory Summary</h2>
+            {% for item in inventory %}
+            <div class="flex justify-between py-2 border-b border-gray-100 last:border-0">
+                <span>{{ item.blood_type }}</span><span class="font-medium">{{ item.units_available }} units</span>
+            </div>
+            {% else %}<p class="text-gray-500">No inventory recorded.</p>{% endfor %}
+        </section>
+        <section class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Recent Accepted Donations</h2>
+            {% for donation in recent_donations %}
+            <div class="flex justify-between py-2 border-b border-gray-100 last:border-0">
+                <span>{{ donation.blood_type }} - {{ donation.units }} units</span><span class="text-gray-500">{{ donation.status }}</span>
+            </div>
+            {% else %}<p class="text-gray-500">No recent donations.</p>{% endfor %}
+        </section>
+    </div>
+</div>
+{% endblock %}

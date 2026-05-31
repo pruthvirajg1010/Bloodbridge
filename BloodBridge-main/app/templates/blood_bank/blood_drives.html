@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-wrap justify-between items-center gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">My Blood Drives</h1>
+            <p class="mt-1 text-gray-600">Schedule drives and review registrations.</p>
+        </div>
+        <a href="{{ url_for('blood_bank.create_drive') }}" class="px-5 py-3 bg-red-600 text-white rounded-md hover:bg-red-700">Create Drive</a>
+    </div>
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        {% for drive in drives.items %}
+        <div class="p-6 border-b border-gray-100 last:border-0 flex flex-wrap justify-between gap-4">
+            <div>
+                <a href="{{ url_for('blood_bank.drive_detail', id=drive.id) }}" class="text-lg font-semibold text-gray-900 hover:text-red-600">{{ drive.title }}</a>
+                <p class="mt-1 text-gray-600">{{ drive.location }} | {{ drive.start_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                <p class="mt-1 text-sm text-gray-500">{{ drive.registrations|length }} registration(s)</p>
+            </div>
+            <span class="text-sm font-medium text-gray-600">{{ drive.status }}</span>
+        </div>
+        {% else %}<div class="p-10 text-center text-gray-500">No blood drives scheduled yet.</div>{% endfor %}
+    </div>
+    {% if drives.pages > 1 %}
+    <div class="mt-6 flex justify-center gap-4">
+        {% if drives.has_prev %}<a href="{{ url_for('blood_bank.blood_drives', page=drives.prev_num) }}" class="px-4 py-2 border rounded-md">Previous</a>{% endif %}
+        <span class="px-4 py-2">Page {{ drives.page }} of {{ drives.pages }}</span>
+        {% if drives.has_next %}<a href="{{ url_for('blood_bank.blood_drives', page=drives.next_num) }}" class="px-4 py-2 border rounded-md">Next</a>{% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-wrap justify-between items-center gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">{{ current_user.bank_name }} Dashboard</h1>
+            <p class="mt-1 text-gray-600">Manage blood supply and collection drives.</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{{ url_for('blood_bank.inventory') }}" class="px-4 py-2 border border-red-600 text-red-600 rounded-md hover:bg-red-50">Manage Inventory</a>
+            <a href="{{ url_for('blood_bank.create_drive') }}" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">New Blood Drive</a>
+        </div>
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+        <div class="bg-white shadow rounded-lg p-6">
+            <p class="text-sm font-medium text-gray-500">Total Drives</p>
+            <p class="mt-2 text-3xl font-bold text-gray-900">{{ total_drives }}</p>
+        </div>
+        <div class="bg-white shadow rounded-lg p-6">
+            <p class="text-sm font-medium text-gray-500">Upcoming / Active Drives</p>
+            <p class="mt-2 text-3xl font-bold text-gray-900">{{ upcoming_drives }}</p>
+        </div>
+        <div class="bg-white shadow rounded-lg p-6">
+            <p class="text-sm font-medium text-gray-500">Drive Registrations</p>
+            <p class="mt-2 text-3xl font-bold text-gray-900">{{ total_registrations }}</p>
+        </div>
+    </div>
+
+    {% if low_stock %}
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-5 mb-8">
+        <h2 class="font-semibold text-yellow-900">Low Stock Alert</h2>
+        <p class="mt-1 text-yellow-800">
+            {% for item in low_stock %}{{ item.blood_type }} ({{ item.units_available }} units){% if not loop.last %}, {% endif %}{% endfor %}
+        </p>
+    </div>
+    {% endif %}
+
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        <div class="flex justify-between items-center px-6 py-5 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900">Recent Blood Drives</h2>
+            <a href="{{ url_for('blood_bank.blood_drives') }}" class="text-red-600 hover:text-red-800 font-medium">View All</a>
+        </div>
+        {% for drive in recent_drives %}
+        <div class="px-6 py-4 border-b border-gray-100 last:border-0 flex flex-wrap justify-between gap-3">
+            <div>
+                <a href="{{ url_for('blood_bank.drive_detail', id=drive.id) }}" class="font-medium text-gray-900 hover:text-red-600">{{ drive.title }}</a>
+                <p class="text-sm text-gray-500">{{ drive.location }} | {{ drive.start_date.strftime('%Y-%m-%d %H:%M') }}</p>
+            </div>
+            <span class="text-sm font-medium text-gray-600">{{ drive.status }}</span>
+        </div>
+        {% else %}
+        <div class="p-8 text-center text-gray-500">No blood drives scheduled yet.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

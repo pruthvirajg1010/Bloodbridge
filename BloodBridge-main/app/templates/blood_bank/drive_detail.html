@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-wrap justify-between items-start gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">{{ drive.title }}</h1>
+            <p class="mt-2 text-gray-600">{{ drive.location }} | {{ drive.start_date.strftime('%Y-%m-%d %H:%M') }} to {{ drive.end_date.strftime('%Y-%m-%d %H:%M') }}</p>
+            <p class="mt-2 text-gray-700">{{ drive.description }}</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{{ url_for('blood_bank.edit_drive', drive_id=drive.id) }}" class="px-4 py-2 border border-red-600 text-red-600 rounded-md">Edit</a>
+            <span class="px-4 py-2 bg-gray-100 rounded-md font-medium">{{ drive.status }}</span>
+        </div>
+    </div>
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        <div class="px-6 py-5 border-b"><h2 class="text-xl font-semibold">Registered Donors</h2></div>
+        {% for registration in registrations %}
+        <div class="px-6 py-4 border-b border-gray-100 last:border-0 flex justify-between items-center gap-4">
+            <div>
+                <p class="font-medium">{{ registration.donor.first_name }} {{ registration.donor.last_name }}</p>
+                <p class="text-sm text-gray-500">{{ registration.donor.blood_type }} | {{ registration.donor.email }}</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-sm text-gray-600">{{ registration.status }}</span>
+                {% if registration.status == 'REGISTERED' %}
+                <form action="{{ url_for('blood_bank.mark_attendance', registration_id=registration.id) }}" method="POST">
+                    <button type="submit" class="px-3 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700">Mark Attended</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}<div class="p-8 text-center text-gray-500">No donors have registered for this drive.</div>{% endfor %}
+    </div>
+</div>
+{% endblock %}

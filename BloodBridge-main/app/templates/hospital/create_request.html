@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Create Blood Request</h1>
+        <p class="mt-2 text-gray-600">Submit a patient requirement for admin review and inventory allocation.</p>
+    </div>
+
+    <form action="{{ url_for('hospital.create_request') }}" method="POST" class="bg-white shadow rounded-lg p-8 space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+                <label for="blood_type" class="block text-sm font-medium text-gray-700">Blood Type</label>
+                <select id="blood_type" name="blood_type" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500">
+                    <option value="">Select blood type</option>
+                    {% for blood_type in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                    <option value="{{ blood_type }}" {% if request.form.get('blood_type') == blood_type %}selected{% endif %}>{{ blood_type }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="units_needed" class="block text-sm font-medium text-gray-700">Units Needed</label>
+                <input type="number" min="1" id="units_needed" name="units_needed" value="{{ request.form.get('units_needed', '') }}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+                <label for="priority" class="block text-sm font-medium text-gray-700">Priority</label>
+                <select id="priority" name="priority" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500">
+                    <option value="">Select priority</option>
+                    {% for priority in ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'] %}
+                    <option value="{{ priority }}" {% if request.form.get('priority') == priority %}selected{% endif %}>{{ priority|title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="deadline" class="block text-sm font-medium text-gray-700">Required By</label>
+                <input type="datetime-local" id="deadline" name="deadline" value="{{ request.form.get('deadline', '') }}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500">
+            </div>
+        </div>
+
+        <div>
+            <label for="patient_details" class="block text-sm font-medium text-gray-700">Patient Details</label>
+            <textarea id="patient_details" name="patient_details" rows="4" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500">{{ request.form.get('patient_details', '') }}</textarea>
+        </div>
+
+        <div class="flex justify-end gap-3">
+            <a href="{{ url_for('hospital.blood_requests') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</a>
+            <button type="submit" class="px-5 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Submit Request</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

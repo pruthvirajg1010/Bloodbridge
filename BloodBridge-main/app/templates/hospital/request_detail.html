@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Blood Request #{{ request.id }}</h1>
+            <p class="mt-1 text-gray-600">{{ request.blood_type }} blood, {{ request.units_needed }} unit(s) required</p>
+        </div>
+        <a href="{{ url_for('hospital.blood_requests') }}" class="text-red-600 hover:text-red-800">Back to Requests</a>
+    </div>
+
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div><dt class="text-sm text-gray-500">Status</dt><dd class="font-semibold">{{ request.status }}</dd></div>
+            <div><dt class="text-sm text-gray-500">Priority</dt><dd class="font-semibold">{{ request.priority }}</dd></div>
+            <div><dt class="text-sm text-gray-500">Deadline</dt><dd class="font-semibold">{{ request.deadline.strftime('%Y-%m-%d %H:%M') if request.deadline else '-' }}</dd></div>
+            <div><dt class="text-sm text-gray-500">Created</dt><dd class="font-semibold">{{ request.created_at.strftime('%Y-%m-%d %H:%M') if request.created_at else '-' }}</dd></div>
+            <div class="sm:col-span-2"><dt class="text-sm text-gray-500">Patient Details</dt><dd class="mt-1">{{ request.patient_details }}</dd></div>
+            {% if request.admin_notes %}
+            <div class="sm:col-span-2"><dt class="text-sm text-gray-500">Admin Notes</dt><dd class="mt-1">{{ request.admin_notes }}</dd></div>
+            {% endif %}
+        </dl>
+    </div>
+
+    {% if request.status == 'PENDING' %}
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">Update Pending Request</h2>
+        <form action="{{ url_for('hospital.update_request', id=request.id) }}" method="POST" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Units Needed</label>
+                    <input type="number" min="1" name="units_needed" value="{{ request.units_needed }}" required class="mt-1 block w-full px-3 py-2 border rounded-md">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Priority</label>
+                    <select name="priority" required class="mt-1 block w-full px-3 py-2 border rounded-md">
+                        {% for priority in ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'] %}
+                        <option value="{{ priority }}" {% if request.priority == priority %}selected{% endif %}>{{ priority|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Required By</label>
+                    <input type="datetime-local" name="deadline" value="{{ request.deadline.strftime('%Y-%m-%dT%H:%M') if request.deadline else '' }}" required class="mt-1 block w-full px-3 py-2 border rounded-md">
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Patient Details</label>
+                <textarea name="patient_details" rows="3" required class="mt-1 block w-full px-3 py-2 border rounded-md">{{ request.patient_details }}</textarea>
+            </div>
+            <div class="flex justify-between">
+                <button type="submit" class="px-5 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Update Request</button>
+            </div>
+        </form>
+        <form action="{{ url_for('hospital.cancel_request', id=request.id) }}" method="POST" class="mt-4" onsubmit="return confirm('Cancel this request?');">
+            <button type="submit" class="text-red-600 hover:text-red-800 font-medium">Cancel Request</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Linked Donations</h2>
+        {% set completed_units = donations|selectattr('status', 'equalto', 'COMPLETED')|sum(attribute='units') %}
+        <p class="mb-4 text-sm text-gray-600">Completed linked donations: <span class="font-semibold">{{ completed_units }}</span> / {{ request.units_needed }} unit(s)</p>
+        {% for donation in donations %}
+        <div class="border-b border-gray-100 py-3 last:border-0">
+            {{ donation.donor.first_name }} {{ donation.donor.last_name }}: {{ donation.blood_type }} - {{ donation.units }} unit(s)
+            <span class="float-right text-sm text-gray-500">{{ donation.status }}</span>
+        </div>
+        {% else %}
+        <p class="text-gray-500">No donations linked to this request yet.</p>
+        {% endfor %}
+    </div>
+    {% if request.allocations %}
+    <div class="bg-white shadow rounded-lg p-6 mt-6">
+        <h2 class="text-xl font-semibold mb-4">Supplied By Blood Banks</h2>
+        {% for allocation in request.allocations %}
+        <div class="border-b border-gray-100 py-3 last:border-0 flex justify-between">
+            <span>{{ allocation.inventory.blood_bank.bank_name }}</span>
+            <span class="font-medium">{{ allocation.units_allocated }} unit(s) of {{ allocation.inventory.blood_type }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

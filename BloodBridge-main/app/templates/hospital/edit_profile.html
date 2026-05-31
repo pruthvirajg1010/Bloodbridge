@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Edit Hospital Profile</h1>
+    <form method="POST" class="bg-white shadow rounded-lg p-8 space-y-6">
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Hospital Name</label>
+            <input name="hospital_name" value="{{ current_user.hospital_name or '' }}" required class="mt-1 block w-full px-3 py-2 border rounded-md">
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Contact First Name</label>
+                <input name="first_name" value="{{ current_user.first_name or '' }}" required class="mt-1 block w-full px-3 py-2 border rounded-md">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Contact Last Name</label>
+                <input name="last_name" value="{{ current_user.last_name or '' }}" required class="mt-1 block w-full px-3 py-2 border rounded-md">
+            </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">License Number</label>
+                <input name="license_number" value="{{ current_user.license_number or '' }}" class="mt-1 block w-full px-3 py-2 border rounded-md">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Phone</label>
+                <input name="phone" value="{{ current_user.phone or '' }}" class="mt-1 block w-full px-3 py-2 border rounded-md">
+            </div>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Emergency Contact</label>
+            <input name="emergency_contact" value="{{ current_user.emergency_contact or '' }}" class="mt-1 block w-full px-3 py-2 border rounded-md">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Address</label>
+            <textarea name="address" rows="2" class="mt-1 block w-full px-3 py-2 border rounded-md">{{ current_user.address or '' }}</textarea>
+        </div>
+        <div class="flex justify-end gap-3">
+            <a href="{{ url_for('hospital.profile') }}" class="px-4 py-2 border rounded-md">Cancel</a>
+            <button class="px-5 py-2 bg-red-600 text-white rounded-md">Save Profile</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

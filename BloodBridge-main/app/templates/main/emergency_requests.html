@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-wrap justify-between items-center gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Urgent Blood Requests</h1>
+            <p class="mt-2 text-gray-600">Critical and high-priority requests awaiting support.</p>
+        </div>
+        {% if current_user.is_authenticated and current_user.user_type == 'hospital' %}
+        <a href="{{ url_for('hospital.create_request') }}" class="px-5 py-3 bg-red-600 text-white rounded-md hover:bg-red-700">Create Emergency Request</a>
+        {% endif %}
+    </div>
+
+    <div class="space-y-4">
+        {% for blood_request in requests.items %}
+        <div class="bg-white shadow rounded-lg p-6 flex flex-wrap justify-between gap-4">
+            <div>
+                <h2 class="text-lg font-semibold text-gray-900">
+                    {{ blood_request.hospital.hospital_name if blood_request.hospital else 'Emergency Request' }}
+                </h2>
+                <p class="mt-2 text-gray-700">{{ blood_request.units_needed }} unit(s) of <span class="font-semibold text-red-700">{{ blood_request.blood_type }}</span></p>
+                <p class="mt-1 text-sm text-gray-500">Required by {{ blood_request.deadline.strftime('%Y-%m-%d %H:%M') if blood_request.deadline else 'Not specified' }}</p>
+            </div>
+            <span class="h-fit px-3 py-1 rounded-full text-sm font-semibold {% if blood_request.priority == 'CRITICAL' %}bg-red-100 text-red-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                {{ blood_request.priority }}
+            </span>
+        </div>
+        {% else %}
+        <div class="bg-white shadow rounded-lg p-10 text-center text-gray-500">No urgent requests are pending right now.</div>
+        {% endfor %}
+    </div>
+
+    {% if requests.pages > 1 %}
+    <div class="mt-8 flex justify-center gap-4">
+        {% if requests.has_prev %}<a href="{{ url_for('main.emergency_requests', page=requests.prev_num) }}" class="px-4 py-2 border rounded-md">Previous</a>{% endif %}
+        <span class="px-4 py-2">Page {{ requests.page }} of {{ requests.pages }}</span>
+        {% if requests.has_next %}<a href="{{ url_for('main.emergency_requests', page=requests.next_num) }}" class="px-4 py-2 border rounded-md">Next</a>{% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

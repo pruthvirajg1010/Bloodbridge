@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">{% if is_edit %}Edit Blood Drive{% else %}Create Blood Drive{% endif %}</h1>
+    <form action="{% if is_edit %}{{ url_for('blood_bank.edit_drive', drive_id=drive.id) }}{% else %}{{ url_for('blood_bank.create_drive') }}{% endif %}" method="POST" class="bg-white shadow rounded-lg p-8 space-y-6">
+        <div>
+            <label for="title" class="block text-sm font-medium text-gray-700">Drive Title</label>
+            <input type="text" id="title" name="title" value="{{ drive.title if drive else request.form.get('title', '') }}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500">
+        </div>
+        <div>
+            <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+            <textarea id="description" name="description" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500">{{ drive.description if drive else request.form.get('description', '') }}</textarea>
+        </div>
+        <div>
+            <label for="location" class="block text-sm font-medium text-gray-700">Location</label>
+            <input type="text" id="location" name="location" value="{{ drive.location if drive else request.form.get('location', '') }}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500">
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+                <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date and Time</label>
+                <input type="datetime-local" id="start_date" name="start_date" value="{{ drive.start_date.strftime('%Y-%m-%dT%H:%M') if drive else request.form.get('start_date', '') }}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500">
+            </div>
+            <div>
+                <label for="end_date" class="block text-sm font-medium text-gray-700">End Date and Time</label>
+                <input type="datetime-local" id="end_date" name="end_date" value="{{ drive.end_date.strftime('%Y-%m-%dT%H:%M') if drive else request.form.get('end_date', '') }}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500">
+            </div>
+        </div>
+        {% if is_edit %}
+        <div>
+            <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+            <select id="status" name="status" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+                {% for status in ['UPCOMING', 'ONGOING', 'COMPLETED', 'CANCELLED'] %}
+                <option value="{{ status }}" {% if drive.status == status %}selected{% endif %}>{{ status|title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+        <div class="flex justify-end gap-3">
+            <a href="{{ url_for('blood_bank.blood_drives') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</a>
+            <button type="submit" class="px-5 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">{% if is_edit %}Update Drive{% else %}Create Drive{% endif %}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

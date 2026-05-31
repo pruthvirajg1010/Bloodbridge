@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-wrap justify-between items-center gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">{{ current_user.hospital_name }}</h1>
+            <p class="mt-1 text-gray-600">License: {{ current_user.license_number or 'Not provided' }}</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{{ url_for('hospital.edit_profile') }}" class="px-5 py-3 border border-red-600 text-red-600 rounded-md hover:bg-red-50">Edit Profile</a>
+            <a href="{{ url_for('hospital.create_request') }}" class="px-5 py-3 bg-red-600 text-white rounded-md hover:bg-red-700">Create Blood Request</a>
+        </div>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-2">
+        <section class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Recent Requests</h2>
+            {% for blood_request in recent_requests %}
+            <a href="{{ url_for('hospital.request_detail', id=blood_request.id) }}" class="block border-b border-gray-100 py-3 last:border-0 hover:text-red-600">
+                {{ blood_request.blood_type }} - {{ blood_request.units_needed }} unit(s)
+                <span class="float-right text-sm text-gray-500">{{ blood_request.status }}</span>
+            </a>
+            {% else %}
+            <p class="text-gray-500">No requests submitted yet.</p>
+            {% endfor %}
+        </section>
+
+        <section class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Completed Donations for Requests</h2>
+            {% for donation in recent_donations %}
+            <div class="border-b border-gray-100 py-3 last:border-0">
+                {{ donation.blood_type }} - {{ donation.units }} unit(s)
+                <span class="float-right text-sm text-gray-500">{{ donation.donation_date.strftime('%Y-%m-%d') if donation.donation_date else '' }}</span>
+            </div>
+            {% else %}
+            <p class="text-gray-500">No completed donations recorded.</p>
+            {% endfor %}
+        </section>
+    </div>
+</div>
+{% endblock %}
